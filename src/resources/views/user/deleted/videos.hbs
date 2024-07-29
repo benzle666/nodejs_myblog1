@@ -1,0 +1,108 @@
+<div class="mt-4">
+    <h3>Deleted videos list</h3>
+    <table class="table mt-4">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">DeletedAt</th>
+                <th scope="col">LastEdit</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each videos}}
+            <tr>
+                <th scope="row">{{sum @index 1}}</th>
+                <td>{{this.name}}</td>
+                <td>{{this.deletedAt}}</td>
+                <td>{{this.updatedAt}}</td>
+                <td>
+                    <a href="/" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#restore-video-model" data-id="{{this._id}}">Restore</a>
+                    <a href="/" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#delete-video-model" data-id="{{this._id}}">Delete forever</a>
+                </td>
+            </tr>
+            {{else}}
+            <tr>
+                <td colspan="5" class="text-center">No video deleted</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+    <div>
+      <a href="/user/storage/videos">Back to video storage</a>
+    </div>
+</div>
+
+{{!-- Models --}}
+<div class="modal" id="delete-video-model" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Please note that you can't undo this action!</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" id="btn-delete-video" class="btn btn-danger">Permanent delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="restore-video-model" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Are you sure?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" id="btn-restore-video" class="btn btn-danger">Restore</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{!-- Hidden forms --}}
+<form method="post" id="delete-video-form"></form>
+<form method="post" id="restore-video-form"></form>
+
+<script>
+  // Hard delete
+  const deleteVideoModel = document.getElementById('delete-video-model')
+  var videoId
+  var deleteForm = document.forms['delete-video-form']
+  const btnDeleteVideo = document.getElementById('btn-delete-video')
+
+  if (deleteVideoModel) {
+    deleteVideoModel.addEventListener('show.bs.modal', event => {
+      const button = event.relatedTarget
+      videoId = button.getAttribute('data-id')
+    })
+  }
+
+  btnDeleteVideo.onclick = function () {
+    deleteForm.action = '/videos/' + videoId + '/force' + '?_method=DELETE' 
+    deleteForm.submit()
+  }
+
+  // Restore
+  const restoreVideoModel = document.getElementById('restore-video-model')
+  var restoreVideoId
+  var restoreForm = document.forms['restore-video-form']
+  const btnRestoreVideo = document.getElementById('btn-restore-video')
+
+  if (restoreVideoModel) {
+    restoreVideoModel.addEventListener('show.bs.modal', event => {
+      const restoreButton = event.relatedTarget
+      restoreVideoId = restoreButton.getAttribute('data-id')
+    })
+  }
+
+  btnRestoreVideo.onclick = function () {
+    restoreForm.action = '/videos/' + restoreVideoId + '/restore' + '?_method=PATCH' 
+    restoreForm.submit()
+  }
+</script>

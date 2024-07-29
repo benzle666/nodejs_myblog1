@@ -1,0 +1,133 @@
+<form class="mt-4" id="container-form" method="post" action="/videos/handle-form-actions">
+    <h2 id="header-id">Videos list</h2>
+    <div class="mt-4 d-flex align-items-center">
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" value="" id="checkbox-all">
+        <label class="form-check-label" for="checkbox-all">
+          Select all
+        </label>
+      </div>
+      <select class="form-select" aria-label="Default select example" name="action" required>
+        <option value="">Options</option>
+        <option value="delete">Delete</option>
+        <option value="delete">2</option>
+        <option value="delete">3</option>
+      </select>
+      <button class="btn btn-primary btn-multiple-submit disabled">Confirm</button>
+    </div>
+    <table class="table mt-4">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">
+                  Name
+                  {{{sortable 'name' _sort}}}
+                </th>
+                <th scope="col">
+                  CreatedAt
+                  {{{sortable 'createdAt' _sort}}}
+                </th>
+                <th scope="col">
+                  UpdatedAt
+                  {{{sortable 'updatedAt' _sort}}}
+                </th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each videos}}
+            <tr>
+                <td>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="videoIds[]" value="{{this._id}}">
+                  </div>
+                </td>
+                <th scope="row">{{sum @index 1}}</th>
+                <td>{{this.name}}</td>
+                <td>{{this.createdAt}}</td>
+                <td>{{this.updatedAt}}</td>
+                <td>
+                    <a href="/videos/{{this._id}}/edit" class="btn btn-link">Edit</a>
+                    <a href="/" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#delete-video-model" data-id="{{this._id}}">Delete</a>
+                </td>
+            </tr>
+            {{else}}
+            <tr>
+                <td colspan="5" class="text-center">You haven't post any video yet! <a href="/videos/create">Click here to post your video</a></td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+    <div>
+      <a href="/user/deleted/videos">Trash bin ({{deletedCount}})</a>
+    </div>
+</form>
+
+{{!-- Comfirm delete video model --}}
+<div class="modal" id="delete-video-model" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirm delete?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" id="btn-delete-video" class="btn btn-danger">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{!-- Hidden form --}}
+<form method="post" id="delete-video-form">
+
+<script>
+  // Soft delete
+  const deleteVideoModel = document.getElementById('delete-video-model')
+  var videoId
+  var deleteForm = document.forms['delete-video-form']
+  const btnDeleteVideo = document.getElementById('btn-delete-video')
+
+  if (deleteVideoModel) {
+    deleteVideoModel.addEventListener('show.bs.modal', event => {
+      const button = event.relatedTarget
+      videoId = button.getAttribute('data-id')
+    })
+  }
+
+  btnDeleteVideo.onclick = function () {
+    deleteForm.action = '/videos/' + videoId + '?_method=DELETE' 
+    deleteForm.submit()
+  }
+
+  // Select handle
+  $(() => {
+    var checkboxAll = $('#checkbox-all')
+    var videoItemCheckbox = $('input[name="videoIds[]"]')
+    var multipleSubmitBtn = $('.btn-multiple-submit')
+
+    checkboxAll.change(function(){
+          var isCheckedAll = $(this).prop('checked')
+          videoItemCheckbox.prop('checked', isCheckedAll)
+          renderMultipleVideoSubmitBtn()
+    });
+
+    videoItemCheckbox.change(function() {
+      var areAllChecked = videoItemCheckbox.length === $('input[name="videoIds[]"]:checked').length
+      checkboxAll.prop('checked', areAllChecked)
+      renderMultipleVideoSubmitBtn()
+    })
+
+    function renderMultipleVideoSubmitBtn() {
+      var checkedLength = $('input[name="videoIds[]"]:checked').length
+      if (checkedLength > 0) {
+        multipleSubmitBtn.removeClass('disabled')
+      } else {
+        multipleSubmitBtn.addClass('disabled')
+      }
+    }
+  })
+  
+</script>

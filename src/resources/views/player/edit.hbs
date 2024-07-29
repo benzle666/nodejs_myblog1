@@ -1,0 +1,26 @@
+<div class="mt-4">
+    <h3>Edit video</h3>
+    <form method="post" action="/videos/{{video._id}}?_method=PUT">
+        <div class="mb-3">
+            <label for="name" class="form-label">Video title</label>
+            <input type="text" class="form-control" value="{{video.name}}" id="exampleInputEmail1" name="name">
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="exampleInputEmail1" name="description">{{video.description}}</textarea>
+        </div>
+        <div class="mb-3">
+            <label for="image" class="form-label">Image Url</label>
+            <input type="text" class="form-control" value="{{video.image}}" id="exampleInputEmail1" name="image">
+        </div>
+        <div class="mb-3">
+            <label for="videoId" class="form-label">Video ID</label>
+            <input type="text" class="form-control" value="{{video.videoId}}" id="exampleInputEmail1" name="videoId">
+        </div>
+        <div class="mb-3">
+            <label for="slug" class="form-label">Slug</label>
+            <input type="text" class="form-control" value="{{video.slug}}" id="exampleInputEmail1" name="slug">
+        </div>
+        <button type="submit" class="btn btn-primary">Confirm</button>
+    </form>
+</div>
